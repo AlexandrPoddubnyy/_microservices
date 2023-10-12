@@ -1,0 +1,220 @@
+REPOSITORY                 TAG       IMAGE ID       CREATED              SIZE
+yourname/ubuntu-tmp-file   latest    94b30e010011   About a minute ago   63.2MB
+nginx                      latest    61395b4c586d   2 weeks ago          187MB
+ubuntu                     18.04     f9a80a55f492   4 months ago         63.2MB
+hello-world                latest    9c7a54a9a43c   5 months ago         13.3kB
+
+
+
+Задание со * : Отличия образа от контейнера на примере образа ubuntu и контейнера запушенного на его основе.
+
+Кратко - Образ статичен (начальный слой).
+         На вид (по данным отличий) в контейнере есть контейнеро-спецефисеские опции, отличия от образа, те опции которые системо-зависимы и которые так или иначе меняются или которые можно изменить.
+         В контейнере дополнительный слой (IMAge), относительно образа
+
+Детали:
+
+> diff IMAGE CONT -y | cat
+[                                                               [
+    {                                                               {
+        "Id": "sha256:f9a80a55f492e823bf5d51f1bd5f87ea3eed1cb |         "Id": "3958200af65c46dbf6424d11c767d8c78abd1272cf886e
+        "RepoTags": [                                         |         "Created": "2023-10-08T08:53:11.251530542Z",
+            "ubuntu:18.04"                                    |         "Path": "/bin/bash",
+        ],                                                    |         "Args": [],
+        "RepoDigests": [                                      |         "State": {
+            "ubuntu@sha256:152dc042452c496007f07ca9127571cb9c |             "Status": "exited",
+        ],                                                    |             "Running": false,
+        "Parent": "",                                         |             "Paused": false,
+        "Comment": "",                                        |             "Restarting": false,
+        "Created": "2023-05-30T09:32:09.432301537Z",          |             "OOMKilled": false,
+        "Container": "00da56b63e7a5e6508d4ff7a380a7fb2b4e7ffc |             "Dead": false,
+        "ContainerConfig": {                                  |             "Pid": 0,
+            "Hostname": "00da56b63e7a",                       |             "ExitCode": 0,
+            "Domainname": "",                                 |             "Error": "",
+            "User": "",                                       |             "StartedAt": "2023-10-08T08:56:42.124495696Z",
+            "AttachStdin": false,                             |             "FinishedAt": "2023-10-08T09:01:52.467046459Z"
+            "AttachStdout": false,                            |         },
+            "AttachStderr": false,                            |         "Image": "sha256:f9a80a55f492e823bf5d51f1bd5f87ea3eed
+            "Tty": false,                                     |         "ResolvConfPath": "/var/lib/docker/containers/3958200
+            "OpenStdin": false,                               |         "HostnamePath": "/var/lib/docker/containers/3958200af
+            "StdinOnce": false,                               |         "HostsPath": "/var/lib/docker/containers/3958200af65c
+            "Env": [                                          |         "LogPath": "/var/lib/docker/containers/3958200af65c46
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbi |         "Name": "/amazing_goldwasser",
+                                                              >         "RestartCount": 0,
+                                                              >         "Driver": "overlay2",
+                                                              >         "Platform": "linux",
+                                                              >         "MountLabel": "",
+                                                              >         "ProcessLabel": "",
+                                                              >         "AppArmorProfile": "docker-default",
+                                                              >         "ExecIDs": null,
+                                                              >         "HostConfig": {
+                                                              >             "Binds": null,
+                                                              >             "ContainerIDFile": "",
+                                                              >             "LogConfig": {
+                                                              >                 "Type": "json-file",
+                                                              >                 "Config": {
+                                                              >                     "max-file": "5",
+                                                              >                     "max-size": "10m"
+                                                              >                 }
+                                                              >             },
+                                                              >             "NetworkMode": "default",
+                                                              >             "PortBindings": {},
+                                                              >             "RestartPolicy": {
+                                                              >                 "Name": "no",
+                                                              >                 "MaximumRetryCount": 0
+                                                              >             },
+                                                              >             "AutoRemove": false,
+                                                              >             "VolumeDriver": "",
+                                                              >             "VolumesFrom": null,
+                                                              >             "CapAdd": null,
+                                                              >             "CapDrop": null,
+                                                              >             "CgroupnsMode": "host",
+                                                              >             "Dns": [],
+                                                              >             "DnsOptions": [],
+                                                              >             "DnsSearch": [],
+                                                              >             "ExtraHosts": null,
+                                                              >             "GroupAdd": null,
+                                                              >             "IpcMode": "private",
+                                                              >             "Cgroup": "",
+                                                              >             "Links": null,
+                                                              >             "OomScoreAdj": 0,
+                                                              >             "PidMode": "",
+                                                              >             "Privileged": false,
+                                                              >             "PublishAllPorts": false,
+                                                              >             "ReadonlyRootfs": false,
+                                                              >             "SecurityOpt": null,
+                                                              >             "UTSMode": "",
+                                                              >             "UsernsMode": "",
+                                                              >             "ShmSize": 67108864,
+                                                              >             "Runtime": "runc",
+                                                              >             "ConsoleSize": [
+                                                              >                 0,
+                                                              >                 0
+            ],                                                              ],
+            "Cmd": [                                          |             "Isolation": "",
+                "/bin/sh",                                    |             "CpuShares": 0,
+                "-c",                                         |             "Memory": 0,
+                "#(nop) ",                                    |             "NanoCpus": 0,
+                "CMD [\"/bin/bash\"]"                         |             "CgroupParent": "",
+                                                              >             "BlkioWeight": 0,
+                                                              >             "BlkioWeightDevice": [],
+                                                              >             "BlkioDeviceReadBps": null,
+                                                              >             "BlkioDeviceWriteBps": null,
+                                                              >             "BlkioDeviceReadIOps": null,
+                                                              >             "BlkioDeviceWriteIOps": null,
+                                                              >             "CpuPeriod": 0,
+                                                              >             "CpuQuota": 0,
+                                                              >             "CpuRealtimePeriod": 0,
+                                                              >             "CpuRealtimeRuntime": 0,
+                                                              >             "CpusetCpus": "",
+                                                              >             "CpusetMems": "",
+                                                              >             "Devices": [],
+                                                              >             "DeviceCgroupRules": null,
+                                                              >             "DeviceRequests": null,
+                                                              >             "KernelMemory": 0,
+                                                              >             "KernelMemoryTCP": 0,
+                                                              >             "MemoryReservation": 0,
+                                                              >             "MemorySwap": 0,
+                                                              >             "MemorySwappiness": null,
+                                                              >             "OomKillDisable": false,
+                                                              >             "PidsLimit": null,
+                                                              >             "Ulimits": null,
+                                                              >             "CpuCount": 0,
+                                                              >             "CpuPercent": 0,
+                                                              >             "IOMaximumIOps": 0,
+                                                              >             "IOMaximumBandwidth": 0,
+                                                              >             "MaskedPaths": [
+                                                              >                 "/proc/asound",
+                                                              >                 "/proc/acpi",
+                                                              >                 "/proc/kcore",
+                                                              >                 "/proc/keys",
+                                                              >                 "/proc/latency_stats",
+                                                              >                 "/proc/timer_list",
+                                                              >                 "/proc/timer_stats",
+                                                              >                 "/proc/sched_debug",
+                                                              >                 "/proc/scsi",
+                                                              >                 "/sys/firmware"
+            ],                                                              ],
+            "Image": "sha256:e24e6fe4d70b767b0621c909f548dab7 |             "ReadonlyPaths": [
+            "Volumes": null,                                  |                 "/proc/bus",
+            "WorkingDir": "",                                 |                 "/proc/fs",
+            "Entrypoint": null,                               |                 "/proc/irq",
+            "OnBuild": null,                                  |                 "/proc/sys",
+            "Labels": {                                       |                 "/proc/sysrq-trigger"
+                "org.opencontainers.image.ref.name": "ubuntu" |             ]
+                "org.opencontainers.image.version": "18.04"   |         },
+            }                                                 |         "GraphDriver": {
+                                                              >             "Data": {
+                                                              >                 "LowerDir": "/var/lib/docker/overlay2/41b4a45
+                                                              >                 "MergedDir": "/var/lib/docker/overlay2/41b4a4
+                                                              >                 "UpperDir": "/var/lib/docker/overlay2/41b4a45
+                                                              >                 "WorkDir": "/var/lib/docker/overlay2/41b4a456
+                                                              >             },
+                                                              >             "Name": "overlay2"
+        },                                                              },
+        "DockerVersion": "20.10.21",                          |         "Mounts": [],
+        "Author": "",                                         <
+        "Config": {                                                     "Config": {
+            "Hostname": "",                                   |             "Hostname": "3958200af65c",
+            "Domainname": "",                                               "Domainname": "",
+            "User": "",                                                     "User": "",
+            "AttachStdin": false,                             |             "AttachStdin": true,
+            "AttachStdout": false,                            |             "AttachStdout": true,
+            "AttachStderr": false,                            |             "AttachStderr": true,
+            "Tty": false,                                     |             "Tty": true,
+            "OpenStdin": false,                               |             "OpenStdin": true,
+            "StdinOnce": false,                               |             "StdinOnce": true,
+            "Env": [                                                        "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbi                   "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbi
+            ],                                                              ],
+            "Cmd": [                                                        "Cmd": [
+                "/bin/bash"                                                     "/bin/bash"
+            ],                                                              ],
+            "Image": "sha256:e24e6fe4d70b767b0621c909f548dab7 |             "Image": "ubuntu:18.04",
+            "Volumes": null,                                                "Volumes": null,
+            "WorkingDir": "",                                               "WorkingDir": "",
+            "Entrypoint": null,                                             "Entrypoint": null,
+            "OnBuild": null,                                                "OnBuild": null,
+            "Labels": {                                                     "Labels": {
+                "org.opencontainers.image.ref.name": "ubuntu"                   "org.opencontainers.image.ref.name": "ubuntu"
+                "org.opencontainers.image.version": "18.04"                     "org.opencontainers.image.version": "18.04"
+            }                                                               }
+        },                                                              },
+        "Architecture": "amd64",                              |         "NetworkSettings": {
+        "Os": "linux",                                        |             "Bridge": "",
+        "Size": 63156473,                                     |             "SandboxID": "a633599401f74f7d74426f9e2ffbf11acb9
+        "VirtualSize": 63156473,                              |             "HairpinMode": false,
+        "GraphDriver": {                                      |             "LinkLocalIPv6Address": "",
+            "Data": {                                         |             "LinkLocalIPv6PrefixLen": 0,
+                "MergedDir": "/var/lib/docker/overlay2/45a030 |             "Ports": {},
+                "UpperDir": "/var/lib/docker/overlay2/45a0305 |             "SandboxKey": "/var/run/docker/netns/a633599401f7
+                "WorkDir": "/var/lib/docker/overlay2/45a0305e |             "SecondaryIPAddresses": null,
+            },                                                |             "SecondaryIPv6Addresses": null,
+            "Name": "overlay2"                                |             "EndpointID": "",
+        },                                                    |             "Gateway": "",
+        "RootFS": {                                           |             "GlobalIPv6Address": "",
+            "Type": "layers",                                 |             "GlobalIPv6PrefixLen": 0,
+            "Layers": [                                       |             "IPAddress": "",
+                "sha256:548a79621a426b4eb077c926eabac5a8620c4 |             "IPPrefixLen": 0,
+            ]                                                 |             "IPv6Gateway": "",
+        },                                                    |             "MacAddress": "",
+        "Metadata": {                                         |             "Networks": {
+            "LastTagTime": "0001-01-01T00:00:00Z"             |                 "bridge": {
+                                                              >                     "IPAMConfig": null,
+                                                              >                     "Links": null,
+                                                              >                     "Aliases": null,
+                                                              >                     "NetworkID": "b624e5b53cd066fd670b5a629f7
+                                                              >                     "EndpointID": "",
+                                                              >                     "Gateway": "",
+                                                              >                     "IPAddress": "",
+                                                              >                     "IPPrefixLen": 0,
+                                                              >                     "IPv6Gateway": "",
+                                                              >                     "GlobalIPv6Address": "",
+                                                              >                     "GlobalIPv6PrefixLen": 0,
+                                                              >                     "MacAddress": "",
+                                                              >                     "DriverOpts": null
+                                                              >                 }
+                                                              >             }
+        }                                                               }
+    }                                                               }
+]                                                               ]
