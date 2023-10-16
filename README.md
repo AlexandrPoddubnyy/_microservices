@@ -244,3 +244,37 @@ AlexandrPoddubnyy microservices repository
 ## Как проверить работоспособность:
 
         Например, перейти по ссылке http://127.0.0.1:9292/
+
+
+====================
+Домашнее задание №14:
+====================
+
+## В процессе сделано:
+
+    Кратко:
+    Отработано По плану, целям ДЗ
+        Цели задания
+	    Научиться описывать и собирать Docker-образы для сервисного приложения
+	    Научиться оптимизировать работу с Docker-образами
+	    Запуск и работа приложения на основе Docker-образов, оценка удобства запуска контейнеров при помощи docker run
+	План
+	    Разбить наше приложение на несколько компонентов
+	    Запустить наше микросервисное приложение
+    + Выполнено
+        Второе задание со *
+
+## Как запустить проект:
+
+        cd src
+        docker build -t alexandrpoddubnyy/ui:1.0 ./ui
+        docker build -t alexandrpoddubnyy/post:1.0 ./post-py
+        docker build -t alexandrpoddubnyy/comment:1.0 ./comment
+        docker run -d --network=reddit --network-alias=post_db --network-alias=comment_db  -v reddit_db:/data/db 	mongo:4
+        docker run -d --network=reddit --network-alias=post                               				alexandrpoddubnyy/post:1.0
+        docker run -d --network=reddit --network-alias=comment                            				alexandrpoddubnyy/comment:1.0
+        docker run -d --network=reddit -p 9292:9292                                       				alexandrpoddubnyy/ui:1.0
+
+## Как проверить работоспособность:
+
+        Например, перейти по ссылке http://<docker-host>:9292/
