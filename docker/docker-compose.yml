@@ -57,9 +57,9 @@ services:
       front_net:
         aliases:
           - prometheus
-      ip6net:
-        aliases:
-          - prometheus
+#      ip6net:
+#        aliases:
+#          - prometheus
 
   node-exporter:
     image: prom/node-exporter:v0.15.2
@@ -91,19 +91,19 @@ services:
         aliases:
           - mongodb-exporter
 
-  blackbox-exporter:
-    image: ${USERNAME}/blackbox_exporter
-    ports:
-      - 9115:9115
-#    volumes:
-#      - blackbox-exporter-config:/config
-#    command: # Передаем доп параметры в командной строке
-#      - '--config.file=/etc/blackbox_exporter/config/blackbox.yml'
-    networks:
-#      back_net:
-      ip6net:
-        aliases:
-          - blackbox_exporter
+#  blackbox-exporter:
+#    image: ${USERNAME}/blackbox_exporter
+#    ports:
+#      - 9115:9115
+##    volumes:
+##      - blackbox-exporter-config:/config
+##    command: # Передаем доп параметры в командной строке
+##      - '--config.file=/etc/blackbox_exporter/config/blackbox.yml'
+#    networks:
+##      back_net:
+#      ip6net:
+#        aliases:
+#          - blackbox_exporter
 
 volumes:
   reddit_db:
@@ -122,8 +122,8 @@ networks:
       driver: default
       config:
       - subnet: 10.0.1.0/24
-  ip6net:
-     enable_ipv6: true
-     ipam:
-       config:
-         - subnet: 2001:0DB8::/112
+#  ip6net:
+#     enable_ipv6: true
+#     ipam:
+#       config:
+#         - subnet: 2001:0DB8::/112
