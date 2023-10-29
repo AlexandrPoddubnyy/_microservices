@@ -475,7 +475,7 @@ AlexandrPoddubnyy microservices repository
 ## Как запустить проект:
 
         docker-machine ls
-        eval $(docker-machine env gitlab-ci-vm)
+        eval $(docker-machine env docker-host)
 
         export USERNAME=alexandrpoddubnyy
         cd AlexandrPoddubnyy_microservices/docker
