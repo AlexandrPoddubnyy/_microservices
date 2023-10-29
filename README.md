@@ -469,6 +469,9 @@ AlexandrPoddubnyy microservices repository
             Cбор метрик хоста с использованием экспортера
             Задания со * (1 из 3)
 
+    В Дз запрошено - >> ... Дать ссылку на докер хаб с вашими образами в README.md и описание PR
+    Ссылка- https://hub.docker.com/repositories/alexandrpoddubnyy
+
 ## Как запустить проект:
 
         docker-machine ls
