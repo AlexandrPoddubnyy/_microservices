@@ -1,0 +1,129 @@
+version: '3.3'
+services:
+  post_db:
+    image: mongo:${MONGO_V}
+    volumes:
+      - reddit_db:/data/db
+    networks:
+      back_net:
+        aliases:
+          - post_db
+          - comment_db
+          - mongo_db
+  ui:
+#    build: ./ui
+    image: ${USERNAME}/ui:${UI_V}
+    ports:
+      - ${UI_PORT}:${UI_PORT}/tcp
+    networks:
+      front_net:
+        aliases:
+          - ui
+  post:
+#    build: ./post-py
+    image: ${USERNAME}/post:${POST_V}
+    networks:
+      back_net:
+        aliases:
+          - post
+      front_net:
+        aliases:
+          - post
+  comment:
+#    build: ./comment
+    image: ${USERNAME}/comment:${COMMENT_V}
+    networks:
+      back_net:
+        aliases:
+          - comment
+      front_net:
+        aliases:
+          - comment
+
+  prometheus:
+    image: ${USERNAME}/prometheus
+    ports:
+      - ${PROM_PORT}:${PROM_PORT}
+    volumes:
+      - prometheus_data:/prometheus
+    command: # Передаем доп параметры в командной строке
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention=1d' # Задаем время хранения метрик в 1 день
+    networks:
+      back_net:
+        aliases:
+          - prometheus
+      front_net:
+        aliases:
+          - prometheus
+      ip6net:
+        aliases:
+          - prometheus
+
+  node-exporter:
+    image: prom/node-exporter:v0.15.2
+    user: root
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    networks:
+      back_net:
+        aliases:
+          - node-exporter
+
+  mongodb-exporter:
+    image: percona/mongodb_exporter:0.20
+    environment:
+#      - uri=mongodb://mongo_db:27017
+       - MONGODB_URI=mongo_db:27017
+#    command:
+#      - "./mongodb_exporter --mongodb.uri=mongo_db:27017"
+    ports:
+      - 9216:9216
+    networks:
+      back_net:
+        aliases:
+          - mongodb-exporter
+
+  blackbox-exporter:
+    image: ${USERNAME}/blackbox_exporter
+    ports:
+      - 9115:9115
+#    volumes:
+#      - blackbox-exporter-config:/config
+#    command: # Передаем доп параметры в командной строке
+#      - '--config.file=/etc/blackbox_exporter/config/blackbox.yml'
+    networks:
+#      back_net:
+      ip6net:
+        aliases:
+          - blackbox_exporter
+
+volumes:
+  reddit_db:
+  prometheus_data:
+
+networks:
+  back_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 10.0.2.0/24
+  front_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+      - subnet: 10.0.1.0/24
+  ip6net:
+     enable_ipv6: true
+     ipam:
+       config:
+         - subnet: 2001:0DB8::/112
