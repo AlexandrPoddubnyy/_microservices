@@ -453,3 +453,38 @@ AlexandrPoddubnyy microservices repository
 ## Как проверить работоспособность:
 
         Например, перейти по ссылке Gitlab http://51.250.7.249/homework/example,  ссылки Pipeline, Enviroment и др
+
+
+====================
+Домашнее задание №17:
+====================
+
+## В процессе сделано:
+
+    Кратко: Отработаны все задания в соотвествии с документом к ДЗ
+        Введение в мониторинг. Системы мониторинга.
+        План
+            Prometheus: запуск, конфигурация, знакомство с Web UI
+            Мониторинг состояния микросервисов
+            Cбор метрик хоста с использованием экспортера
+            Задания со * (1 из 3)
+
+    В Дз запрошено - >> ... Дать ссылку на докер хаб с вашими образами в README.md и описание PR
+    Ссылка- https://hub.docker.com/repositories/alexandrpoddubnyy
+
+## Как запустить проект:
+
+        docker-machine ls
+        eval $(docker-machine env docker-host)
+
+        export USERNAME=alexandrpoddubnyy
+        cd AlexandrPoddubnyy_microservices/docker
+        docker-compose up -d
+
+## Как проверить работоспособность:
+
+        Например, перейти по ссылкам
+                http://158.160.104.202:9292/ -app
+                http://158.160.104.202:9090/ -prometheus
+                http://158.160.104.202:9090/targets - prom-targets
+                http://158.160.104.202:9115/- интерфейс blackbox-exporter и тп
