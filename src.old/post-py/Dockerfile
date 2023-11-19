@@ -4,7 +4,7 @@ FROM python:3.6-alpine
 WORKDIR /app
 ADD . /app
 
-RUN apk --no-cache --update add build-base gcc musl-dev && \
+RUN apk --no-cache --update add build-base && \
     pip install -r /app/requirements.txt && \
     apk del build-base && \
     rm -rf /etc/apk/cache && rm -rf /var/cache/apk
