@@ -488,3 +488,59 @@ AlexandrPoddubnyy microservices repository
                 http://158.160.104.202:9090/ -prometheus
                 http://158.160.104.202:9090/targets - prom-targets
                 http://158.160.104.202:9115/- интерфейс blackbox-exporter и тп
+
+
+====================
+Домашнее задание №18:
+====================
+
+## В процессе сделано:
+
+    Кратко: Отработаны все задания в соотвествии с документом к ДЗ
+    Логирование и распределенная трассировка
+        План
+            Подготовка окружения
+            Логирование Docker-контейнеров
+            Сбор неструктурированных логов
+            Визуализация логов
+            Сбор структурированных логов
+                //Сбор неструктурированных логов
+            Распределенный трейсинг
+
+## Как запустить проект:
+
+    > yc compute instance create \
+            --name logging \
+            --hostname logging \
+            --memory=8 \
+            --cores=2 \
+            --create-boot-disk image-folder-id=standard-images,image-family=ubuntu-1804-lts,size=50GB \
+            --network-interface subnet-name=default-ru-central1-a,nat-ip-version=ipv4 \
+            --metadata serial-port-enable=1 \
+            --metadata-from-file='user-data=logging-vm_startup.yaml'
+    > docker-machine create \
+            --driver generic \
+            --generic-ip-address=158.160.32.188 \
+                    --generic-ssh-user ap1 \
+                    --generic-ssh-key ~/.ssh/id_rsa \
+                    logging
+    > docker-machine ls
+    > eval $(docker-machine env logging)
+    export USERNAME=alexandrpoddubnyy
+
+    cd AlexandrPoddubnyy_microservices/
+    cd ./src/ui && bash docker_build.sh && docker push $USER_NAME/ui:logging
+    cd ../post-py && bash docker_build.sh && docker push $USER_NAME/post:logging
+    cd ../comment && bash docker_build.sh && docker push $USER_NAME/comment:logging
+
+    cd AlexandrPoddubnyy_microservices/docker
+    docker-compose up -d
+    docker-compose -f docker-compose-logging.yml up -d
+
+
+## Как проверить работоспособность:
+
+        Например, перейти по ссылкам
+                http://158.160.32.188:9292/ -app
+                http://158.160.32.188:5601/- kibana
+                http://158.160.32.188:9411/ -zipkin
