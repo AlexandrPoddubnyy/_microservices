@@ -545,8 +545,10 @@ AlexandrPoddubnyy microservices repository
                 http://158.160.32.188:5601/- kibana
                 http://158.160.32.188:9411/ -zipkin
 
+====================
+====================
 
-Домашнее задание №18:
+Домашнее задание №19:
 ====================
 
 ## В процессе сделано:
@@ -555,14 +557,14 @@ AlexandrPoddubnyy microservices repository
 Кроме задания с **
 
 Цели по ДЗ
-    1. Разобрать на практике все компоненты Kubernetes, развернуть их вручную используя kubeadm
-    2. Ознакомиться с описанием основных примитивов нашего приложения и его дальнейшим запуском в Kubernetes
+* Разобрать на практике все компоненты Kubernetes, развернуть их вручную используя kubeadm
+* Ознакомиться с описанием основных примитивов нашего приложения и его дальнейшим запуском в Kubernetes
 
 ## Как запустить проект:
 
 Порядок произведенных действий:
 
-1. На локал хосте запускаем (поднимуся 2-е ноды в ya-облаке)
+1. На локал хосте запускаем (поднимуnся 2-е ноды в ya-облаке)
 
 ```
 yc compute instance create \
@@ -585,7 +587,7 @@ yc compute instance create \
             --metadata-from-file='user-data=logging-vm_startup.yaml'
 ```
 
-2. На каждой свеже созданной ноде (общие настройки)
+2. На каждой свеже-созданной ноде (общие настройки)
 
 ```
 sudo su
@@ -638,7 +640,6 @@ apt-get install kubeadm -y
 
 # mark - NOT install updates
 apt-mark hold kubelet kubeadm kubectl
-
 ```
 
 3. 1-а нода (инициация кластера, control-plane)
@@ -649,14 +650,13 @@ echo "export KUBECONFIG=/etc/kubernetes/admin.conf" > /etc/environment
 export KUBECONFIG=/etc/kubernetes/admin.conf
 ```
 
-3. 2-а нода (worker-нода)
+4. 2-а нода (worker-нода)
 
 ```
 kubeadm join 10.128.0.22:6443 --token cw94gs.12axnb6vms3ydcf7 --discovery-token-ca-cert-hash sha256:333XXXXXX --cri-socket unix:///var/run/cri-dockerd.sock
-
 ```
 
-4. 1-а нода (доделки, сетевой плагин)
+5. 1-а нода (доделки, сетевой плагин)
 
 ```
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.4/manifests/tigera-operator.yaml
@@ -671,7 +671,7 @@ knode1   Ready    control-plane   29m   v1.28.4
 knode2   Ready    <none>          19m   v1.28.4
 ```
 
-5. localhost
+6. localhost
 
 ```
 # установка и настройка локального kubectl
@@ -714,15 +714,13 @@ comment-deployment-6b9ddb7c7b-2cprl   1/1     Running   0          70m   10.244.
 mongo-deployment-8fccbc5fb-ldhj7      1/1     Running   0          14m   10.244.69.198   knode2   <none>           <none>
 post-deployment-7d856cbfc8-5hgkr      1/1     Running   0          73m   10.244.69.195   knode2   <none>           <none>
 ui-deployment-5879f59d5-t8s4g         1/1     Running   0          67m   10.244.69.197   knode2   <none>           <none>
-
 ```
 
-6. 1-нода (тестовый проброс трафика на порт к приложению)
+7. 1-нода (тестовый проброс трафика на порт к приложению)
 
 ```
 kubectl  port-forward ui-deployment-5879f59d5-t8s4g --address 0.0.0.0 9292:9292
 ```
-
 
 ## Как проверить работоспособность:
 
@@ -732,3 +730,6 @@ kubectl  port-forward ui-deployment-5879f59d5-t8s4g --address 0.0.0.0 9292:9292
 Замечание - стартовая страница открылась, но в целом приложение предсказуемо не заработало на текущих образах,
 Тк. то что было собрано ранее (для докера) требует пересборки, переназначения имен, перенастроки в части сети и тп.
 Все джедайские техники о починке приложения, полагаю, будут разобраны в следующих ДЗ.
+
+====================
+====================
