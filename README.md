@@ -2,11 +2,15 @@
 AlexandrPoddubnyy microservices repository
 
 ====================
+====================
+
 Домашнее задание №12:
 ====================
     не поступало
 
 ====================
+====================
+
 Домашнее задание №13:
 ====================
 
@@ -247,6 +251,8 @@ AlexandrPoddubnyy microservices repository
 
 
 ====================
+====================
+
 Домашнее задание №14:
 ====================
 
@@ -281,6 +287,8 @@ AlexandrPoddubnyy microservices repository
 
 
 ====================
+====================
+
 Домашнее задание №15:
 ====================
 
@@ -363,6 +371,8 @@ AlexandrPoddubnyy microservices repository
 
 
 ====================
+====================
+
 Домашнее задание №16:
 ====================
 
@@ -456,6 +466,8 @@ AlexandrPoddubnyy microservices repository
 
 
 ====================
+====================
+
 Домашнее задание №17:
 ====================
 
@@ -491,6 +503,8 @@ AlexandrPoddubnyy microservices repository
 
 
 ====================
+====================
+
 Домашнее задание №18:
 ====================
 
@@ -544,3 +558,192 @@ AlexandrPoddubnyy microservices repository
                 http://158.160.32.188:9292/ -app
                 http://158.160.32.188:5601/- kibana
                 http://158.160.32.188:9411/ -zipkin
+
+====================
+====================
+
+Домашнее задание №19:
+====================
+
+## В процессе сделано:
+
+Отработаны все задания в соотвествии с документом к ДЗ
+Кроме задания с **
+
+Цели по ДЗ
+* Разобрать на практике все компоненты Kubernetes, развернуть их вручную используя kubeadm
+* Ознакомиться с описанием основных примитивов нашего приложения и его дальнейшим запуском в Kubernetes
+
+## Как запустить проект:
+
+Порядок произведенных действий:
+
+1. На локал хосте запускаем (поднимуnся 2-е ноды в ya-облаке)
+
+```
+yc compute instance create \
+            --name knode1 \
+            --hostname knode1 \
+            --memory=8 \
+            --cores=4 \
+            --create-boot-disk image-folder-id=standard-images,image-family=ubuntu-1804-lts,size=50GB \
+            --network-interface subnet-name=default-ru-central1-a,nat-ip-version=ipv4 \
+            --metadata serial-port-enable=1 \
+            --metadata-from-file='user-data=logging-vm_startup.yaml'
+yc compute instance create \
+            --name knode2 \
+            --hostname knode2 \
+            --memory=8 \
+            --cores=4 \
+            --create-boot-disk image-folder-id=standard-images,image-family=ubuntu-1804-lts,size=50GB \
+            --network-interface subnet-name=default-ru-central1-a,nat-ip-version=ipv4 \
+            --metadata serial-port-enable=1 \
+            --metadata-from-file='user-data=logging-vm_startup.yaml'
+```
+
+2. На каждой свеже-созданной ноде (общие настройки)
+
+```
+sudo su
+apt-get update
+apt-get install -y apt-transport-https ca-certificates curl
+
+# kubectl
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/trusted.gpg.d/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get update
+sudo apt-get install -y kubectl
+
+# разное
+echo -e "br_netfilter\noverlay\n" > /etc/modules-load.d/k8s.conf
+cat /etc/modules-load.d/k8s.conf
+modprobe br_netfilter
+modprobe overlay
+lsmod | egrep "br_netfilter|overlay"
+apt-get install bash-completion
+echo 'source /etc/bash_completion '      >>~/.bashrc
+echo 'source <(kubectl completion bash)' >>~/.bashrc
+
+# docker
+sudo apt-get update
+sudo apt-get install ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+# Add the repository to Apt sources:
+echo \
+"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+$(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+#Latest
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+sudo docker run hello-world
+
+#cri-dockerd
+wget https://github.com/Mirantis/cri-dockerd/releases/download/v0.3.7/cri-dockerd_0.3.7.3-0.ubuntu-bionic_amd64.deb
+apt-get install ./cri-dockerd_0.3.7.3-0.ubuntu-bionic_amd64.deb -y
+rm cri-dockerd_0.3.7.3-0.ubuntu-bionic_amd64.deb
+systemctl | grep cri-docker
+ls -al /var/run/containerd/containerd.sock
+ls -al /var/run/crio/crio.sock
+ls -al /var/run/cri-dockerd.sock
+
+# kubeadm
+apt-get install kubeadm -y
+
+# mark - NOT install updates
+apt-mark hold kubelet kubeadm kubectl
+```
+
+3. 1-а нода (инициация кластера, control-plane)
+
+```
+kubeadm init --apiserver-cert-extra-sans=10.128.0.22 --apiserver-advertise-address=0.0.0.0 --control-plane-endpoint=10.128.0.22 --pod-network-cidr=10.244.0.0/16  --cri-socket unix:///var/run/cri-dockerd.sock
+echo "export KUBECONFIG=/etc/kubernetes/admin.conf" > /etc/environment
+export KUBECONFIG=/etc/kubernetes/admin.conf
+```
+
+4. 2-а нода (worker-нода)
+
+```
+kubeadm join 10.128.0.22:6443 --token cw94gs.12axnb6vms3ydcf7 --discovery-token-ca-cert-hash sha256:333XXXXXX --cri-socket unix:///var/run/cri-dockerd.sock
+```
+
+5. 1-а нода (доделки, сетевой плагин)
+
+```
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.4/manifests/tigera-operator.yaml
+curl https://raw.githubusercontent.com/projectcalico/calico/v3.26.4/manifests/custom-resources.yaml -O
+mcedit custom-resources.yaml  #correct to  10.244.0.0/16
+kubectl create -f custom-resources.yaml
+watch kubectl get pods -n calico-system
+
+root@knode1:/home/ap1# kubectl get nodes
+NAME     STATUS   ROLES           AGE   VERSION
+knode1   Ready    control-plane   29m   v1.28.4
+knode2   Ready    <none>          19m   v1.28.4
+```
+
+6. localhost
+
+```
+# установка и настройка локального kubectl
+cat <<EOF | sudo tee /etc/zypp/repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://pkgs.k8s.io/core:/stable:/v1.28/rpm/
+enabled=1
+gpgcheck=1
+gpgkey=https://pkgs.k8s.io/core:/stable:/v1.28/rpm/repodata/repomd.xml.key
+EOF
+sudo zypper install -y kubectl
+mcedit /home/ap1/ya_admin_kuber.conf
+kubectl --insecure-skip-tls-verify  --kubeconfig /home/ap1/ya_admin_kuber.conf get nodes
+NAME     STATUS   ROLES           AGE   VERSION
+knode1   Ready    control-plane   70m   v1.28.4
+knode2   Ready    <none>          59m   v1.28.4
+
+# работа с обектами проекта, основное
+cd AlexandrPoddubnyy_microservices/kubernetes/reddit
+mcedit comment-deployment.yml
+mcedit mongo-deployment.yml
+mcedit post-deployment.yml
+mcedit ui-deployment.yml
+
+kubectl --insecure-skip-tls-verify  --kubeconfig /home/ap1/ya_admin_kuber.conf apply -f post-deployment.yml
+kubectl --insecure-skip-tls-verify  --kubeconfig /home/ap1/ya_admin_kuber.conf apply -f comment-deployment.yml
+kubectl --insecure-skip-tls-verify  --kubeconfig /home/ap1/ya_admin_kuber.conf apply -f ui-deployment.yml
+
+kubectl --insecure-skip-tls-verify  --kubeconfig /home/ap1/ya_admin_kuber.conf apply -f mongo-deployment.yml
+The Deployment "mongo-deployment" is invalid:
+* spec.template.spec.hostAliases.hostnames: Invalid value: "post_db": a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
+* spec.template.spec.hostAliases.hostnames: Invalid value: "comment_db": a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
+* spec.template.spec.hostAliases.hostnames: Invalid value: "mongo_db": a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')
+mcedit mongo-deployment.yml
+kubectl --insecure-skip-tls-verify  --kubeconfig /home/ap1/ya_admin_kuber.conf apply -f mongo-deployment.yml
+
+kubectl --insecure-skip-tls-verify  --kubeconfig /home/ap1/ya_admin_kuber.conf get pods --output=wideNAME                                  READY   STATUS    RESTARTS   AGE   IP              NODE     NOMINATED NODE   READINESS GATES
+comment-deployment-6b9ddb7c7b-2cprl   1/1     Running   0          70m   10.244.69.196   knode2   <none>           <none>
+mongo-deployment-8fccbc5fb-ldhj7      1/1     Running   0          14m   10.244.69.198   knode2   <none>           <none>
+post-deployment-7d856cbfc8-5hgkr      1/1     Running   0          73m   10.244.69.195   knode2   <none>           <none>
+ui-deployment-5879f59d5-t8s4g         1/1     Running   0          67m   10.244.69.197   knode2   <none>           <none>
+```
+
+7. 1-нода (тестовый проброс трафика на порт к приложению)
+
+```
+kubectl  port-forward ui-deployment-5879f59d5-t8s4g --address 0.0.0.0 9292:9292
+```
+
+## Как проверить работоспособность:
+
+Например, перейти по ссылкам
+>  http://158.160.32.188:9292/ -app
+
+Замечание - стартовая страница открылась, но в целом приложение предсказуемо не заработало на текущих образах,
+Тк. то что было собрано ранее (для докера) требует пересборки, переназначения имен, перенастроки в части сети и тп.
+Все джедайские техники о починке приложения, полагаю, будут разобраны в следующих ДЗ.
+
+====================
+====================
