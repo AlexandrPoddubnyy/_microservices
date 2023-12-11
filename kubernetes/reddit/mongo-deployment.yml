@@ -1,36 +1,52 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo-deployment
+  name: mongo
+  labels:
+    app: reddit
+    component: mongo
+    comment-db: "true"
+    post-db: "true"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mongo
+      app: reddit
+      component: mongo
   template:
     metadata:
       name: mongo
       labels:
-        app: mongo
+        app: reddit
+        component: mongo
+        comment-db: "true"
+        post-db: "true"
     spec:
       containers:
       - image: mongo:4
         name: mongo
         volumeMounts:
-        - mountPath: /data/db
-          name: mongo-data
-      hostAliases:
-      - hostnames:
-        - "postdb"
-        - "commentdb"
-        - "mongodb"
-        ip: "10.244.69.200"
-#TEST:
+         - name: mongo-data
+           mountPath: /data/db
       volumes:
       - name: mongo-data
-        hostPath:
-          path: "/data/db"
+        emptyDir: {}
 
+#name: mongo-persistent-storage
+
+##      hostAliases:
+##      - hostnames:
+##        - "postdb"
+##        - "commentdb"
+##        - "mongodb"
+##        ip: "10.244.69.200"
+#TEST:
+#      volumes:
+#      - name: mongo-data
+#        hostPath:
+#          path: "/data/db"
+#
 #ODLS
 #        volumes:
 #          - reddit_db:/data/db

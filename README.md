@@ -747,3 +747,103 @@ kubectl  port-forward ui-deployment-5879f59d5-t8s4g --address 0.0.0.0 9292:9292
 
 ====================
 ====================
+
+Домашнее задание №20:
+====================
+
+## В процессе сделано:
+
+Отработаны все задания в соотвествии с документом к ДЗ, Кроме задания со *
+План:
+    Развернуть локальное окружение для работы с Kubernetes
+    Развернуть Kubernetes в Yandex Cloud
+    Запустить reddit в Kubernetes
+
+
+## Как запустить проект:
+
+1. Локальное окружение
+
+а) Инсталляция minikube и настройка сервиса локально
+```
+# install minikube
+curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-latest.x86_64.rpm
+sudo zypper in minikube-latest.x86_64.rpm
+
+# start
+sudo vi /etc/vbox/networks.conf
+minikube start
+#debug dns:
+#minikube ssh
+kubectl edit configmap coredns -n kube-system
+##поставил макс 5000 вместо 1000
+
+cd ~/repo/otus/AlexandrPoddubnyy_microservices/kubernetes/reddit
+mcedit ui-deployment.yml
+mcedit comment-deployment.yml
+mcedit post-deployment.yml
+mcedit mongo-deployment.yml
+
+mcedit comment-service.yml
+mcedit post-service.yml
+mcedit mongo-service.yml
+
+mcedit comment-mongodb-service.yml
+mcedit mongo-deployment.yml
+mcedit post-mongodb-service.yml
+mcedit mongo-deployment.yml
+
+mcedit ui-service.yml
+
+kubectl apply -f .
+
+minikube service ui
+
+mcedit dev-namespace.yml
+mcedit ui-servce ## rem NODEPort
+mcedit ui-deployment.yml
+kubectl apply -n dev -f .
+
+```
+Проверка -
+http://192.168.59.100:32092/  - Worked
+http://192.168.59.100:31502   - Dev Worked
+
+
+б) Инсталляция дашборда к minikube
+```
+minikube addons enable dashboard
+minikube dashboard --url
+```
+Просмотр- http://127.0.0.1:43869/api/v1/namespaces/kubernetes-dashboard/services/http:kubernetes-dashboard:/proxy/  - Worked
+
+
+2. Кластер Kubernetes в Yandex Cloud
+
+а) Настройка в веб-интерфейсе YC по инструкциям
+
+б) Настройка kubectl для использования клаcтера в yc, и запуск приложения в кластере на yc
+
+```
+yc managed-kubernetes cluster get-credentials test-kluster --external
+
+kubectl apply -f ./kubernetes/reddit/dev-namespace.yml
+kubectl apply -f ./kubernetes/reddit/ -n dev
+
+kubectl get pods -n dev
+kubectl get services -n dev
+kubectl get nodes -o wide
+kubectl describe service ui -n dev | grep NodePort
+
+```
+
+## Как проверить работоспособность:
+
+Например, перейти по ссылкам
+>  http://158.160.112.188:30383/
+
+Скриншот - Screenshot_20231211_192909.png
+
+
+====================
+====================
