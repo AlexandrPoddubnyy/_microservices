@@ -847,3 +847,47 @@ kubectl describe service ui -n dev | grep NodePort
 
 ====================
 ====================
+
+Домашнее задание №21:
+====================
+
+## В процессе сделано:
+
+Тема: Kubernetes. Networks, Storages.
+Отработаны все задания в соотвествии с документом к ДЗ, Кроме задания со *
+План:
+    Ingress Controller
+    Ingress
+    Secret
+    TLS
+    LoadBalancer Service
+    Network Policies (частично)
+    PersistentVolumes
+    PersistentVolumeClaims
+
+
+## Как запустить проект:
+
+Ingress Nginx ставился в итоге через Helm
+HELM взят здесь -
+> https://get.helm.sh/helm-v3.13.2-linux-amd64.tar.gz
+
+```
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm install ingress-nginx ingress-nginx/ingress-nginx
+```
+
+Основная тема запуска проекта-
+```
+cd kubernetes/reddit ; kubectl apply -n dev -f .
+```
+
+
+## Как проверить работоспособность:
+
+Например, перейти по ссылкам
+>  https://158.160.133.104/
+
+
+====================
+====================
