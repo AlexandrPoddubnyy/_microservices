@@ -1,0 +1,22 @@
+
+
+comment:
+  image:
+    repository: alexandrpoddubnyy/comment
+    tag: "1.0"
+  service:
+    externalPort: 9292
+
+post:
+  image:
+    repository: alexandrpoddubnyy/post
+    tag: "1.0"
+  service:
+    externalPort: 5000
+
+ui:
+  image:
+    repository: alexandrpoddubnyy/ui
+    tag: "1.0"
+  service:
+    externalPort: 9292
