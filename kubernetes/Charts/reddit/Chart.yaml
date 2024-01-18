@@ -1,0 +1,6 @@
+name: reddit
+description: OTUS sample reddit application
+maintainers:
+  - name: AlexandrPoddubnyy
+    email: a.n.poddubnyy@gmail.com
+version: 0.1.0

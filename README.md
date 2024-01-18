@@ -891,3 +891,174 @@ cd kubernetes/reddit ; kubectl apply -n dev -f .
 
 ====================
 ====================
+
+Домашнее задание №22:
+====================
+
+## В процессе сделано:
+
+Тема: CI/CD в Kubernetes
+Отработаны все задания в соотвествии с документом к ДЗ, Кроме задания со *
+План:
+* Работа с Helm
+* Развертывание Gitlab в Kubernetes
+* Запуск CI/CD конвейера в Kubernetes
+
+
+Отработанные пункты ДЗ-
+* Helm
+* Helm - установка
+* Charts
+* Templates
+* Задание
+* Управление зависимостями
+* Как обезопасить себя?
+* Helm3
+* Порисерчил? Теперь сделай, как было:)
+* GitLab+Kubernetes
+* Установим GitLab
+* Запустим проект
+* Настроим CI
+* Задание
+* Настроим CI
+* Деплоим
+* Пайплайн здорового человека
+* Задание
+* Задание со * / нет
+* Организационное задание
+
+
+Основные вехи, моменты, которые необходимо отметить:
+
+0) Использовались поднятые по предыдущим заданиям ресурсы:
+- кластер k8s поднятый в YC ,
+- тестовый кластер k8s поднятый на обычных нодах в YC,
+- docker-host
+
+1) Много правок в файла с чартами, сервисами и др,
+Работа с отдельными ветками, на внутреннем гитлаб сервере и др.
+Работа c helm, kubectl и др.
+Решение большого количества попутных проблем, дебага и тп.
+
+2) tiller не ставился, тк:
+
+а. по материалам к ДЗ сразу не пошло -
+```
+kubectl apply -f tiller.yml
+serviceaccount/tiller created
+error: resource mapping not found for name: "tiller" namespace: "" from "tiller.yml": no matches for kind "ClusterRoleBinding" in version "rbac.authorization.k8s.io/v1beta1"
+ensure CRDs are installed first
+```
+б. тк. используется уже helm3, в котором tiller выпилен
+>https://helm.sh/docs/faq/changes_since_helm2/#removal-of-tiller
+
+3) Т.к старые app UI+POST похоже не работают с новыми версиями монго (это разбиралось в предыдущих ДЗ), то
+перевписал в настройки старую версию, со своим чартом, ручным.
+Приложение работает.
+
+4) гитлаб с предложенной в ДЗ схемы не поставился:
+```
+Charts/gitlab-omnibus> helm install gitlab . -f values.yaml
+WARNING: This chart is deprecated
+...
+```
+Поднимался по документации
+>https://docs.gitlab.com/charts/installation/deployment.html
+>https://docs.gitlab.com/ee/ci/docker/using_docker_build.html#use-docker-in-docker
+и др.
+
+Примерно так-
+```
+helm upgrade --install gitlab gitlab/gitlab \
+        --timeout 600s \
+        --set global.hosts.domain=example.ap.e4u.ru \
+        --set global.hosts.externalIP=10.10.10.10 \
+        --set certmanager-issuer.email=a.n.poddubnyy@gmail.com \
+            --set postgresql.image.tag=13.6.0
+
+kubectl create rolebinding --namespace=default gitlab-runner-binding --role=gitlab-runner --serviceaccount=gitlab-runner:default
+
+kubectl create clusterrolebinding serviceaccounts-cluster-admin \
+            --clusterrole=cluster-admin \
+            --group=system:serviceaccounts
+
+#?
+kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
+
+helm upgrade --install gitlab gitlab/gitlab \
+        --timeout 600s \
+        --set global.hosts.domain=example.ap.e4u.ru \
+        --set global.hosts.externalIP=158.160.133.104 \
+        --set certmanager-issuer.email=a.n.poddubnyy@gmail.com \
+        --set postgresql.image.tag=13.6.0 \
+        --set global.hosts.https=false \
+        --set gitlab-runner.runners.privileged=true \
+        --set gitlab-runner.gitlabUrl=http://10.96.193.85:8080,runnerRegistrationToken="OTQxE2gonpQcKNZППППППППППППППППППВВВВВВВВВ" \
+```
+Работает.
+
+5) + Отдельный раннер запущен на отдельном докер-хосте
+
+> https://docs.gitlab.com/ee/ci/docker/using_docker_build.html
+
+```
+sudo curl -L --output /usr/local/bin/gitlab-runner https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64
+sudo chmod +x /usr/local/bin/gitlab-runner
+sudo useradd --comment 'GitLab Runner' --create-home gitlab-runner --shell /bin/bash
+sudo gitlab-runner install --user=gitlab-runner --working-directory=/home/gitlab-runner
+sudo gitlab-runner start
+
+gitlab-runner register -n \
+  --url http://gitlab.example.ap.e4u.ru \
+  --token glrt-89nDfym-ЧЧЧЧЫЫВВВВ \
+  --executor shell \
+  --description "My Runner"
+
+sudo usermod -aG docker gitlab-runner
+```
+На этот раннер поставлен тэг докер, и этот же тег в заданиях CI/CD где требуется сборка докер-образов.
+Сборки в такой схеме успешны.
+
+6) CI / Схема сборки образов / Схема получилась отличная от указанной в материалах к ДЗ (по схеме dind, где указаны image: docker:git или docker:18.09.7-dind и тп / c service ).
+Запуск сборки докер образов удалось запустить на выделенном докер-хосте.
+
+7) Некоторые задания CD из материалов к ДЗ не запускаются, видимо из-за опции kubernetes: active (указанны в DZ).
+В https://docs.gitlab.com/ee/ci/yaml/#only-and-except-complex , !!! are deprecated.
+Убрано.
+
+8) CD/ Схема доставки приложений / Схема тоже получилась несколько другая, отличная от материалов в ДЗ.
+Используется  image: alpine/helm:3.2.1.
+Deploy приложений работает.
+
+9) Несколько namespase завел руками
+```
+reddit> kubectl apply -f namespace-otus-stage.yml
+namespace/staging created
+reddit> kubectl apply -f namespace-otus-prod.yml
+namespace/production unchanged
+reddit> kubectl apply -f namespace-otus-review.yml
+namespace/review unchanged
+```
+
+
+## Как запустить проект:
+
+Конептуально - через CI/CD.
+Pipeline Запускаются по событиям, коммитам в git-е, по отдельным проектах для микросервисов, и приложния в целом.
+Подробности к CI/CD в соответсвующих .gitlab-ci.yml
+
+
+## Как проверить работоспособность:
+
+Например, перейти по ссылкам
+>  https://gitlab.example.ap.e4u.ru/   - gitlab, с данными прокта
+
+Приложения, и окружения,  Примеры  -
+>  https://alexandrpoddubnyy-ui-feature-3/  - feature-3 - Работает!
+
+>  https://staging/  - Работает!
+
+>  https://production/ - Работает!
+
+====================
+====================
